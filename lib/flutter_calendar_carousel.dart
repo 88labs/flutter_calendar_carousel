@@ -118,7 +118,6 @@ class CalendarCarousel<T> extends StatefulWidget {
   final bool staticSixWeekFormat;
   final DateTileBuilder dateTileBuilder;
   final Color selectedBgColor;
-  final List<DateTime> mappedDates;
 
   CalendarCarousel({
     this.viewportFraction = 1.0,
@@ -179,7 +178,6 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.staticSixWeekFormat = false,
     this.dateTileBuilder,
     this.selectedBgColor,
-    this.mappedDates,
   });
 
   @override
@@ -475,12 +473,13 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                           ? widget.prevDaysTextStyle
                                           : isNextMonthDay
                                               ? widget.nextDaysTextStyle
-                                              : isSelectedDay
-                                                  ? isToday
-                                                      ? widget.todayTextStyle
-                                                      : widget
+                                              : isToday
+                                                  ? widget.todayTextStyle
+                                                  : isSelectedDay
+                                                      ? widget
                                                           .selectedDayTextStyle
-                                                  : widget.defaultDaysTextStyle,
+                                                      : widget
+                                                          .defaultDaysTextStyle,
                                   maxLines: 1,
                                 ),
                               ),
