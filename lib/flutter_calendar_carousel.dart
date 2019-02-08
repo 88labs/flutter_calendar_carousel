@@ -118,6 +118,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final bool staticSixWeekFormat;
   final DateTileBuilder dateTileBuilder;
   final Color selectedBgColor;
+  final List<DateTime> mappedDates;
 
   CalendarCarousel({
     this.viewportFraction = 1.0,
@@ -178,6 +179,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.staticSixWeekFormat = false,
     this.dateTileBuilder,
     this.selectedBgColor,
+    this.mappedDates,
   });
 
   @override
@@ -202,11 +204,8 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
   int _endWeekday = 0;
   DateFormat _localeDate;
 
-  /// When FIRSTDAYOFWEEK is 0 in dart-intl, it represents Monday. However it is the second day in the arrays of Weekdays.
-  /// Therefore we need to add 1 modulo 7 to pick the right weekday from intl. (cf. [GlobalMaterialLocalizations])
   int firstDayOfWeek = 0;
 
-  /// If the setState called from this class, don't reload the selectedDate, but it should reload selected date if called from external class
   bool _isReloadSelectedDate = true;
 
   @override
@@ -214,13 +213,10 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     super.initState();
     initializeDateFormatting();
 
-    /// setup pageController
     _controller = PageController(
       initialPage: 1,
       keepPage: true,
       viewportFraction: widget.viewportFraction,
-
-      /// width percentage
     );
 
     _localeDate = DateFormat.yMMM(widget.locale);
@@ -371,10 +367,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                 crossAxisCount: 7,
                 childAspectRatio: widget.childAspectRatio,
                 padding: EdgeInsets.zero,
-                children: List.generate(totalItemCount,
-
-                    /// last day of month + weekday
-                    (index) {
+                children: List.generate(totalItemCount, (index) {
                   bool isToday =
                       DateTime.now().day == index + 1 - _startWeekday &&
                           DateTime.now().month == month &&
@@ -432,6 +425,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                           border: Border(
                               bottom: BorderSide(color: Color(0xFFEEEEEE)))),
                       child: Container(
+                        margin: EdgeInsets.only(top: 4),
                         padding: EdgeInsets.all(widget.dayPadding),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -460,11 +454,8 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                 padding: const EdgeInsets.all(5.0),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: isSelectedDay &&
-                                          widget.selectedDayButtonColor != null
-                                      ? widget.selectedDayButtonColor
-                                      : isToday &&
-                                              widget.todayButtonColor != null
+                                  color:
+                                      isToday && widget.todayButtonColor != null
                                           ? widget.todayButtonColor
                                           : widget.dayButtonColor,
                                 ),
@@ -485,21 +476,30 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                           : isNextMonthDay
                                               ? widget.nextDaysTextStyle
                                               : isSelectedDay
-                                                  ? widget.selectedDayTextStyle
-                                                  : isToday
+                                                  ? isToday
                                                       ? widget.todayTextStyle
-                                                      : isSelectable
-                                                          ? widget.daysTextStyle
-                                                          : widget
-                                                              .inactiveDaysTextStyle,
+                                                      : widget
+                                                          .selectedDayTextStyle
+                                                  : widget.defaultDaysTextStyle,
                                   maxLines: 1,
                                 ),
                               ),
                             ),
-                            Container(
-                              child:
-                                  widget.dateTileBuilder(now, isThisMonthDay),
-                              margin: EdgeInsets.all(4),
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.all(4),
+                                child: ListView(
+                                  children: <Widget>[
+                                    Center(
+                                      child: widget.dateTileBuilder(
+                                          now, isThisMonthDay),
+                                    ),
+                                  ],
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                ),
+                              ),
                             )
                           ],
                         ),
@@ -812,15 +812,10 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
           this._weeks = newWeeks;
         });
 
-        print('weeks');
-        print(this._weeks);
-
         _controller.animateToPage(page,
             duration: Duration(milliseconds: 1), curve: Threshold(0.0));
       } else {
-        print('page: $page');
         List<DateTime> dates = this._dates;
-        print('dateLength: ${dates.length}');
         if (page == 0) {
           dates[2] = DateTime(dates[0].year, dates[0].month + 1, 1);
           dates[1] = DateTime(dates[0].year, dates[0].month, 1);
@@ -840,16 +835,10 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
           this._dates = dates;
         });
 
-        print('dates');
-        print(this._dates);
-
         _controller.animateToPage(page,
             duration: Duration(milliseconds: 1), curve: Threshold(0.0));
       }
     }
-
-    print('startWeekDay: $_startWeekday');
-    print('endWeekDay: $_endWeekday');
 
     //call callback
     if (this._dates.length == 3 && widget.onCalendarChanged != null) {
