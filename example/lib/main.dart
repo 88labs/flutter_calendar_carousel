@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
-    show CalendarCarousel;
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
+import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
+    show CalendarCarousel;
 import 'package:intl/intl.dart' show DateFormat;
 
 void main() => runApp(new MyApp());
@@ -52,6 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime _currentDate = DateTime(2019, 1, 3);
   DateTime _currentDate2 = DateTime(2019, 1, 3);
   String _currentMonth = '';
+
 //  List<DateTime> _markedDate = [DateTime(2018, 9, 20), DateTime(2018, 10, 11)];
   static Widget _eventIcon = new Container(
     decoration: new BoxDecoration(
@@ -129,76 +129,41 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    /// Example with custom icon
-    _calendarCarousel = CalendarCarousel<Event>(
-      onDayPressed: (DateTime date, List<Event> events) {
-        this.setState(() => _currentDate = date);
-        events.forEach((event) => print(event.title));
-      },
-      weekendTextStyle: TextStyle(
-        color: Colors.red,
-      ),
-      thisMonthDayBorderColor: Colors.grey,
-//          weekDays: null, /// for pass null when you do not want to render weekDays
-//          headerText: Container( /// Example for rendering custom header
-//            child: Text('Custom Header'),
-//          ),
-//          markedDates: _markedDate,
-      weekFormat: true,
-      markedDatesMap: _markedDateMap,
-      height: 420.0,
-      selectedDateTime: _currentDate,
-//          daysHaveCircularBorder: false, /// null for not rendering any border, true for circular border, false for rectangular border
-      customGridViewPhysics: NeverScrollableScrollPhysics(),
-      markedDateShowIcon: true,
-      markedDateIconMaxShown: 2,
-      todayTextStyle: TextStyle(
-        color: Colors.blue,
-      ),
-      todayBorderColor: Colors.green,
-      markedDateMoreShowTotal:
-          true, // null for not showing hidden events indicator
-//          markedDateIconMargin: 9,
-//          markedDateIconOffset: 3,
-    );
-
     /// Example Calendar Carousel without header and custom prev & next button
     _calendarCarouselNoHeader = CalendarCarousel<Event>(
-      todayBorderColor: Colors.green,
       onDayPressed: (DateTime date, List<Event> events) {
         this.setState(() => _currentDate2 = date);
-        events.forEach((event) => print(event.title));
       },
-      weekendTextStyle: TextStyle(
-        color: Colors.red,
-      ),
+      dateTileBuilder: (date, isThisMonthDay) {
+        return Container(
+            child: Text(
+          '3件',
+          style: TextStyle(
+              fontSize: 12,
+              color: !isThisMonthDay ? Color(0xFFD8D8D8) : Color(0xFF888888)),
+        ));
+      },
+      weekdayTextStyle: TextStyle(color: Color(0xFF888888)),
+      weekendTextStyle: TextStyle(color: Colors.redAccent),
+      daysTextStyle: TextStyle(color: Color(0xFF888888)),
+      selectedDayTextStyle: TextStyle(color: Color(0xFF888888)),
+      nextDaysTextStyle: TextStyle(color: Color(0xFFD8D8D8)),
+      prevDaysTextStyle: TextStyle(color: Color(0xFFD8D8D8)),
+      inactiveDaysTextStyle: TextStyle(color: Color(0xFFD8D8D8)),
+      inactiveWeekendTextStyle: TextStyle(color: Color(0xFFD8D8D8)),
+      headerMargin: EdgeInsets.all(5),
       thisMonthDayBorderColor: Colors.grey,
-      weekFormat: false,
-      markedDatesMap: _markedDateMap,
       height: 420.0,
       selectedDateTime: _currentDate2,
-      customGridViewPhysics: NeverScrollableScrollPhysics(),
-      markedDateShowIcon: true,
-      markedDateIconMaxShown: 2,
-      markedDateMoreShowTotal:
-          false, // null for not showing hidden events indicator
-      showHeader: false,
-      markedDateIconBuilder: (event) {
-        return event.icon;
-      },
       todayTextStyle: TextStyle(
-        color: Colors.blue,
+        color: Colors.white,
       ),
-      todayButtonColor: Colors.yellow,
-      selectedDayTextStyle: TextStyle(
-        color: Colors.green,
-      ),
-      minSelectedDate: _currentDate,
-      maxSelectedDate: _currentDate.add(Duration(days: 60)),
-//      inactiveDateColor: Colors.black12,
-      onCalendarChanged: (DateTime date) {
-        this.setState(() => _currentMonth = DateFormat.yMMM().format(date));
-      },
+      todayButtonColor: Colors.blue,
+      selectedDayBorderColor: Colors.white30,
+      childAspectRatio: 0.9,
+      dayPadding: 0,
+      selectedBgColor: Color.fromRGBO(235, 235, 235, 0.6),
+      locale: 'ja',
     );
 
     return new Scaffold(
@@ -214,7 +179,8 @@ class _MyHomePageState extends State<MyHomePage> {
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 16.0),
                 child: _calendarCarousel,
-              ), // This trailing comma makes auto-formatting nicer for build methods.
+              ),
+              // This trailing comma makes auto-formatting nicer for build methods.
 
               //custom icon without header
               Container(
