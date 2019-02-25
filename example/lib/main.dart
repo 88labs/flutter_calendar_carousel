@@ -131,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     /// Example Calendar Carousel without header and custom prev & next button
     _calendarCarouselNoHeader = CalendarCarousel<Event>(
-      dateTileBuilder: (date, isThisMonthDay) {
+      dateTileBuilder: (date, isThisMonthDay, isSelected) {
         return Container(
             child: Text(
           '3件',
@@ -140,6 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
               color: !isThisMonthDay ? Color(0xFFD8D8D8) : Color(0xFF888888)),
         ));
       },
+      selectedBorderColor: Color(0xFFEF5E5E),
       weekdayTextStyle: TextStyle(color: Color(0xFF888888)),
       weekendTextStyle: TextStyle(color: Colors.redAccent),
       daysTextStyle: TextStyle(color: Color(0xFF888888)),
@@ -159,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
       selectedDayBorderColor: Colors.white30,
       childAspectRatio: 0.9,
       dayPadding: 0,
-      selectedBgColor: Color.fromRGBO(235, 235, 235, 0.6),
+      selectedBgColor: Color(0xFFF7B5B5),
       locale: 'ja',
     );
 

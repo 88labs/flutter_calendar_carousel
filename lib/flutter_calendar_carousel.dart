@@ -8,7 +8,8 @@ import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
-typedef DateTileBuilder = Widget Function(DateTime date, bool isThisMonthDay);
+typedef DateTileBuilder = Widget Function(
+    DateTime date, bool isThisMonthDay, bool isSelected);
 typedef MarkedDateIconBuilder<T> = Widget Function(T event);
 
 class CalendarCarousel<T> extends StatefulWidget {
@@ -118,6 +119,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final bool staticSixWeekFormat;
   final DateTileBuilder dateTileBuilder;
   final Color selectedBgColor;
+  final Color selectedBorderColor;
   final List<DateTime> multiSelectedDate;
 
   CalendarCarousel({
@@ -180,6 +182,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.dateTileBuilder,
     this.selectedBgColor,
     this.multiSelectedDate,
+    this.selectedBorderColor,
   });
 
   @override
@@ -369,7 +372,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                 physics: widget.customGridViewPhysics,
                 crossAxisCount: 7,
                 childAspectRatio: widget.childAspectRatio,
-                padding: EdgeInsets.zero,
+                padding: EdgeInsets.all(2),
                 children: List.generate(totalItemCount, (index) {
                   bool isToday =
                       DateTime.now().day == index + 1 - _startWeekday &&
@@ -429,13 +432,19 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                     child: Container(
                       padding: EdgeInsets.all(widget.dayPadding),
                       decoration: BoxDecoration(
-                          color: isSelectedDay
-                              ? widget.selectedBgColor
-                              : Colors.white,
+                          color: Colors.white,
                           border: Border(
                               bottom: BorderSide(color: Color(0xFFEEEEEE)))),
                       child: Container(
-                        margin: EdgeInsets.only(top: 4),
+                        decoration: BoxDecoration(
+                            color: isSelectedDay
+                                ? widget.selectedBgColor
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                                color: isSelectedDay
+                                    ? widget.selectedBorderColor
+                                    : Colors.white)),
                         padding: EdgeInsets.all(widget.dayPadding),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -504,7 +513,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                   children: <Widget>[
                                     Center(
                                       child: widget.dateTileBuilder(
-                                          now, isThisMonthDay),
+                                          now, isThisMonthDay, isSelectedDay),
                                     ),
                                   ],
                                   physics: NeverScrollableScrollPhysics(),
