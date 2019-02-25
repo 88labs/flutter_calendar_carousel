@@ -78,7 +78,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final Color selectedDayButtonColor;
   final Color selectedDayBorderColor;
   final bool daysHaveCircularBorder;
-  final Function(DateTime, List<T>) onDayPressed;
+  final Function(List<DateTime>, List<T>) onDayPressed;
   final TextStyle weekdayTextStyle;
   final Color iconColor;
   final TextStyle headerTextStyle;
@@ -726,10 +726,11 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
         picked.millisecondsSinceEpoch >
             widget.maxSelectedDate.millisecondsSinceEpoch) return;
 
+    final dates = _multiSelectedDate;
+
     setState(() {
       _isReloadSelectedDate = false;
       _selectedDate = picked;
-      final dates = _multiSelectedDate;
       if (dates.indexOf(picked) > -1) {
         dates.remove(picked);
       } else {
@@ -739,7 +740,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     });
     if (widget.onDayPressed != null)
       widget.onDayPressed(
-          picked,
+          dates,
           widget.markedDatesMap != null
               ? widget.markedDatesMap.getEvents(picked)
               : []);
@@ -764,12 +765,12 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
         _isReloadSelectedDate = false;
         _selectedDate = selected;
       });
-      if (widget.onDayPressed != null)
-        widget.onDayPressed(
-            selected,
-            widget.markedDatesMap != null
-                ? widget.markedDatesMap.getEvents(selected)
-                : []);
+//      if (widget.onDayPressed != null)
+//        widget.onDayPressed(
+//            selected,
+//            widget.markedDatesMap != null
+//                ? widget.markedDatesMap.getEvents(selected)
+//                : []);
       _setDate();
     }
   }
@@ -929,109 +930,109 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     return list;
   }
 
-  Widget _renderMarked(DateTime now) {
-    if (widget.markedDates != null && widget.markedDates.length > 0) {
-      List<DateTime> markedDates = widget.markedDates.map((date) {
-        return DateTime(date.year, date.month, date.day);
-      }).toList();
-      if (markedDates.contains(now)) {
-        return widget.markedDateWidget != null
-            ? widget.markedDateWidget
-            : widget.defaultMarkedDateWidget;
-      }
-    }
-    return Container();
-  }
+//  Widget _renderMarked(DateTime now) {
+//    if (widget.markedDates != null && widget.markedDates.length > 0) {
+//      List<DateTime> markedDates = widget.markedDates.map((date) {
+//        return DateTime(date.year, date.month, date.day);
+//      }).toList();
+//      if (markedDates.contains(now)) {
+//        return widget.markedDateWidget != null
+//            ? widget.markedDateWidget
+//            : widget.defaultMarkedDateWidget;
+//      }
+//    }
+//    return Container();
+//  }
 
-  Widget _renderMarkedMapContainer(DateTime now) {
-    if (widget.markedDateShowIcon) {
-      return Stack(
-        children: _renderMarkedMap(now),
-      );
-    } else {
-      return Container(
-        height: double.infinity,
-        padding: EdgeInsets.only(bottom: 4.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: _renderMarkedMap(now),
-        ),
-      );
-    }
-  }
+//  Widget _renderMarkedMapContainer(DateTime now) {
+//    if (widget.markedDateShowIcon) {
+//      return Stack(
+//        children: _renderMarkedMap(now),
+//      );
+//    } else {
+//      return Container(
+//        height: double.infinity,
+//        padding: EdgeInsets.only(bottom: 4.0),
+//        child: Row(
+//          crossAxisAlignment: CrossAxisAlignment.end,
+//          mainAxisSize: MainAxisSize.max,
+//          mainAxisAlignment: MainAxisAlignment.center,
+//          children: _renderMarkedMap(now),
+//        ),
+//      );
+//    }
+//  }
 
-  List<Widget> _renderMarkedMap(DateTime now) {
-    if (widget.markedDatesMap != null &&
-        widget.markedDatesMap.getEvents(now).length > 0) {
-      List<Widget> tmp = [];
-      int count = 0;
-      double offset = 0.0;
-      double padding = widget.markedDateIconMargin;
-      widget.markedDatesMap.getEvents(now).forEach((event) {
-        if (widget.markedDateShowIcon) {
-          if (tmp.length > 0 && tmp.length < widget.markedDateIconMaxShown) {
-            offset += widget.markedDateIconOffset;
-          }
-          if (tmp.length < widget.markedDateIconMaxShown &&
-              widget.markedDateIconBuilder != null) {
-            tmp.add(Center(
-                child: new Container(
-              padding: EdgeInsets.only(
-                top: padding + offset,
-                left: padding + offset,
-                right: padding - offset,
-                bottom: padding - offset,
-              ),
-              width: double.infinity,
-              height: double.infinity,
-              child: widget.markedDateIconBuilder(event),
-            )));
-          } else {
-            count++;
-          }
-          if (count > 0 && widget.markedDateMoreShowTotal != null) {
-            tmp.add(
-              Positioned(
-                bottom: 0.0,
-                right: 0.0,
-                child: Container(
-                  padding: EdgeInsets.all(3.0),
-                  decoration: widget.markedDateMoreCustomDecoration == null
-                      ? new BoxDecoration(
-                          color: Colors.red,
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(1000.0)),
-                        )
-                      : widget.markedDateMoreCustomDecoration,
-                  child: Center(
-                    child: Text(
-                      widget.markedDateMoreShowTotal
-                          ? (count + widget.markedDateIconMaxShown).toString()
-                          : (count.toString() + '+'),
-                      style: widget.markedDateMoreCustomTextStyle == null
-                          ? TextStyle(
-                              fontSize: 9.0,
-                              color: Colors.white,
-                              fontWeight: FontWeight.normal)
-                          : widget.markedDateMoreCustomTextStyle,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
-        } else {
-          if (widget.markedDateWidget != null) {
-            tmp.add(widget.markedDateWidget);
-          } else {
-            tmp.add(widget.defaultMarkedDateWidget);
-          }
-        }
-      });
-      return tmp;
-    }
-    return [];
-  }
+//  List<Widget> _renderMarkedMap(DateTime now) {
+//    if (widget.markedDatesMap != null &&
+//        widget.markedDatesMap.getEvents(now).length > 0) {
+//      List<Widget> tmp = [];
+//      int count = 0;
+//      double offset = 0.0;
+//      double padding = widget.markedDateIconMargin;
+//      widget.markedDatesMap.getEvents(now).forEach((event) {
+//        if (widget.markedDateShowIcon) {
+//          if (tmp.length > 0 && tmp.length < widget.markedDateIconMaxShown) {
+//            offset += widget.markedDateIconOffset;
+//          }
+//          if (tmp.length < widget.markedDateIconMaxShown &&
+//              widget.markedDateIconBuilder != null) {
+//            tmp.add(Center(
+//                child: new Container(
+//              padding: EdgeInsets.only(
+//                top: padding + offset,
+//                left: padding + offset,
+//                right: padding - offset,
+//                bottom: padding - offset,
+//              ),
+//              width: double.infinity,
+//              height: double.infinity,
+//              child: widget.markedDateIconBuilder(event),
+//            )));
+//          } else {
+//            count++;
+//          }
+//          if (count > 0 && widget.markedDateMoreShowTotal != null) {
+//            tmp.add(
+//              Positioned(
+//                bottom: 0.0,
+//                right: 0.0,
+//                child: Container(
+//                  padding: EdgeInsets.all(3.0),
+//                  decoration: widget.markedDateMoreCustomDecoration == null
+//                      ? new BoxDecoration(
+//                          color: Colors.red,
+//                          borderRadius:
+//                              BorderRadius.all(Radius.circular(1000.0)),
+//                        )
+//                      : widget.markedDateMoreCustomDecoration,
+//                  child: Center(
+//                    child: Text(
+//                      widget.markedDateMoreShowTotal
+//                          ? (count + widget.markedDateIconMaxShown).toString()
+//                          : (count.toString() + '+'),
+//                      style: widget.markedDateMoreCustomTextStyle == null
+//                          ? TextStyle(
+//                              fontSize: 9.0,
+//                              color: Colors.white,
+//                              fontWeight: FontWeight.normal)
+//                          : widget.markedDateMoreCustomTextStyle,
+//                    ),
+//                  ),
+//                ),
+//              ),
+//            );
+//          }
+//        } else {
+//          if (widget.markedDateWidget != null) {
+//            tmp.add(widget.markedDateWidget);
+//          } else {
+//            tmp.add(widget.defaultMarkedDateWidget);
+//          }
+//        }
+//      });
+//      return tmp;
+//    }
+//    return [];
+//  }
 }
