@@ -118,6 +118,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final bool staticSixWeekFormat;
   final DateTileBuilder dateTileBuilder;
   final Color selectedBgColor;
+  final List<DateTime> multiSelectedDate;
 
   CalendarCarousel({
     this.viewportFraction = 1.0,
@@ -178,6 +179,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.staticSixWeekFormat = false,
     this.dateTileBuilder,
     this.selectedBgColor,
+    this.multiSelectedDate,
   });
 
   @override
@@ -201,6 +203,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
   int _startWeekday = 0;
   int _endWeekday = 0;
   DateFormat _localeDate;
+  List<DateTime> _multiSelectedDate = [];
 
   int firstDayOfWeek = 0;
 
@@ -221,6 +224,8 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     firstDayOfWeek = (_localeDate.dateSymbols.FIRSTDAYOFWEEK + 1) % 7;
     if (widget.selectedDateTime != null)
       _selectedDate = widget.selectedDateTime;
+    if (widget.multiSelectedDate != null && widget.multiSelectedDate.isNotEmpty)
+      _multiSelectedDate = widget.multiSelectedDate;
     _setDate();
   }
 
@@ -370,10 +375,17 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                       DateTime.now().day == index + 1 - _startWeekday &&
                           DateTime.now().month == month &&
                           DateTime.now().year == year;
-                  bool isSelectedDay = widget.selectedDateTime != null &&
-                      widget.selectedDateTime.year == year &&
-                      widget.selectedDateTime.month == month &&
-                      widget.selectedDateTime.day == index + 1 - _startWeekday;
+                  bool isSelectedDay = false;
+                  if (_multiSelectedDate != null &&
+                      _multiSelectedDate.isNotEmpty) {
+                    final days = _multiSelectedDate;
+                    isSelectedDay = days
+                        .where((day) =>
+                            day.year == year &&
+                            day.month == month &&
+                            day.day == index + 1 - _startWeekday)
+                        .isNotEmpty;
+                  }
                   bool isPrevMonthDay = index < _startWeekday;
                   bool isNextMonthDay = index >=
                       (DateTime(year, month + 1, 0).day) + _startWeekday;
@@ -552,10 +564,20 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                     bool isToday = weekDays[index].day == DateTime.now().day &&
                         weekDays[index].month == DateTime.now().month &&
                         weekDays[index].year == DateTime.now().year;
-                    bool isSelectedDay = this._selectedDate != null &&
-                        this._selectedDate.year == weekDays[index].year &&
-                        this._selectedDate.month == weekDays[index].month &&
-                        this._selectedDate.day == weekDays[index].day;
+
+                    int year = _dates[slideIndex].year;
+                    int month = _dates[slideIndex].month;
+                    bool isSelectedDay = false;
+                    if (_multiSelectedDate != null &&
+                        _multiSelectedDate.isNotEmpty) {
+                      final days = _multiSelectedDate;
+                      isSelectedDay = days
+                          .where((day) =>
+                              day.year == year &&
+                              day.month == month &&
+                              day.day == index + 1 - _startWeekday)
+                          .isNotEmpty;
+                    }
                     bool isPrevMonthDay =
                         weekDays[index].month < this._selectedDate.month;
                     bool isNextMonthDay =
@@ -707,6 +729,13 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     setState(() {
       _isReloadSelectedDate = false;
       _selectedDate = picked;
+      final dates = _multiSelectedDate;
+      if (dates.indexOf(picked) > -1) {
+        dates.remove(picked);
+      } else {
+        dates.add(picked);
+      }
+      _multiSelectedDate = dates;
     });
     if (widget.onDayPressed != null)
       widget.onDayPressed(
