@@ -29,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.14.11"
+  date_util:
+    dependency: "direct main"
+    description:
+      name: date_util
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.4"
   date_utils:
     dependency: "direct main"
     description:

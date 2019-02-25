@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   date_utils: ^0.1.0
+  date_util: ^0.1.4
 
 dev_dependencies:
   flutter_test:

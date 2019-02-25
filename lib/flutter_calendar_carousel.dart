@@ -2,6 +2,7 @@ library flutter_calendar_dooboo;
 
 import 'dart:async';
 
+import 'package:date_util/date_util.dart';
 import 'package:date_utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
@@ -79,7 +80,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final Color selectedDayButtonColor;
   final Color selectedDayBorderColor;
   final bool daysHaveCircularBorder;
-  final Function(List<DateTime>, List<T>) onDayPressed;
+  final Function(DateTime, List<DateTime>, List<T>) onDayPressed;
   final TextStyle weekdayTextStyle;
   final Color iconColor;
   final TextStyle headerTextStyle;
@@ -382,12 +383,38 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                   if (_multiSelectedDate != null &&
                       _multiSelectedDate.isNotEmpty) {
                     final days = _multiSelectedDate;
-                    isSelectedDay = days
-                        .where((day) =>
-                            day.year == year &&
-                            day.month == month &&
-                            day.day == index + 1 - _startWeekday)
-                        .isNotEmpty;
+                    final day = index + 1 - _startWeekday;
+                    final dayNum = DateUtil().daysInMonth(month, year);
+                    if (day <= 0) {
+                      final prevMonthDay = DateTime(year, month, 1)
+                          .subtract(Duration(days: -1 * (day - 1)));
+                      isSelectedDay = days
+                          .where((_day) =>
+                              _day.year == prevMonthDay.year &&
+                              _day.month == prevMonthDay.month &&
+                              _day.day == prevMonthDay.day)
+                          .isNotEmpty;
+                    } else if (day > dayNum) {
+                      print('hoge');
+                      print(dayNum);
+                      print(day);
+                      final prevMonthDay = DateTime(year, month, dayNum)
+                          .subtract(Duration(days: -(day - dayNum)));
+                      print(prevMonthDay);
+                      isSelectedDay = days
+                          .where((_day) =>
+                              _day.year == prevMonthDay.year &&
+                              _day.month == prevMonthDay.month &&
+                              _day.day == prevMonthDay.day)
+                          .isNotEmpty;
+                    } else {
+                      isSelectedDay = days
+                          .where((_day) =>
+                              _day.year == year &&
+                              _day.month == month &&
+                              _day.day == day)
+                          .isNotEmpty;
+                    }
                   }
                   bool isPrevMonthDay = index < _startWeekday;
                   bool isNextMonthDay = index >=
@@ -749,6 +776,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     });
     if (widget.onDayPressed != null)
       widget.onDayPressed(
+          picked,
           dates,
           widget.markedDatesMap != null
               ? widget.markedDatesMap.getEvents(picked)
