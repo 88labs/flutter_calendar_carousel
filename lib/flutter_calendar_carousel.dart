@@ -150,14 +150,13 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
   PageController _controller;
   List<DateTime> _dates = List(3);
 
-  int _startWeekday = 0;
-  int _endWeekday = 0;
   DateFormat _localeDate;
   List<DateTime> _multiSelectedDate = [];
 
-  int firstDayOfWeek = 0;
+  int _currentPage = 1;
+  bool _shouldChange = true;
 
-  bool _isReloadSelectedDate = true;
+  int firstDayOfWeek = 0;
 
   @override
   initState() {
@@ -168,6 +167,19 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
       initialPage: 1,
       keepPage: true,
     );
+
+    _controller.addListener(() {
+      if (_shouldChange) {
+        final viewPort = _controller.position.viewportDimension.toInt();
+        final offset = _controller.offset.toInt();
+        if (offset % viewPort == 0) {
+          _shouldChange = false;
+          final next = offset ~/ viewPort;
+          _currentPage = next;
+          _setPage(next, null);
+        }
+      }
+    });
 
     _localeDate = DateFormat.yMMM(widget.locale);
     firstDayOfWeek = (_localeDate.dateSymbols.FIRSTDAYOFWEEK + 1) % 7;
@@ -253,13 +265,15 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
               child: PageView.builder(
             itemCount: 3,
             onPageChanged: (index) {
-              this._setPage(index, null);
+              if (_currentPage != index) {
+                _shouldChange = true;
+              }
             },
             controller: _controller,
             itemBuilder: (context, index) {
               return builder(index);
             },
-            pageSnapping: true,
+//            pageSnapping: true,
           )),
         ],
       ),
@@ -267,6 +281,17 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
   }
 
   AnimatedBuilder builder(int slideIndex) {
+    final date = _dates[slideIndex];
+
+    final dates = List<DateTime>(3);
+
+    dates[0] = DateTime(date.year, date.month - 1, 1);
+    dates[1] = DateTime(date.year, date.month, 1);
+    dates[2] = DateTime(date.year, date.month + 1, 1);
+
+    final _startWeekday = dates[1].weekday - firstDayOfWeek;
+    final _endWeekday = dates[2].weekday - firstDayOfWeek;
+
     double screenWidth = MediaQuery.of(context).size.width;
     int totalItemCount = widget.staticSixWeekFormat
         ? 42
@@ -485,65 +510,61 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
 
     if (selected != null) {
       // updating selected date range based on selected week
-      setState(() {
-        _isReloadSelectedDate = false;
-      });
       _setPage(-1, selected);
     }
   }
 
-  void _setDates(DateTime current) {
-    /// Setup default calendar format
-    DateTime date0 = DateTime(current.year, current.month - 1, 1);
-    DateTime date1 = DateTime(current.year, current.month, 1);
-    DateTime date2 = DateTime(current.year, current.month + 1, 1);
-
-    _startWeekday = date1.weekday - firstDayOfWeek;
-    _endWeekday = date2.weekday - firstDayOfWeek;
-    this._dates = [
-      date0,
-      date1,
-      date2,
-    ];
-  }
-
   void _setPage(int page, DateTime date) {
     if (page == -1) {
+      DateTime date0 = DateTime(date.year, date.month - 1, 1);
+      DateTime date1 = DateTime(date.year, date.month, 1);
+      DateTime date2 = DateTime(date.year, date.month + 1, 1);
+
       setState(() {
-        _setDates(DateTime.now());
+        this._dates = [
+          date0,
+          date1,
+          date2,
+        ];
       });
     } else if (page == 1) {
       return;
     } else if (page == 0 || page == 2) {
-      List<DateTime> dates = this._dates;
+      final dates = this._dates;
+      final newDates = List<DateTime>(3);
       if (page == 0) {
-        dates[2] = DateTime(dates[0].year, dates[0].month + 1, 1);
-        dates[1] = DateTime(dates[0].year, dates[0].month, 1);
-        dates[0] = DateTime(dates[0].year, dates[0].month - 1, 1);
-        page = page + 1;
+        newDates[2] = DateTime(dates[0].year, dates[0].month + 1, 1);
+        newDates[1] = DateTime(dates[0].year, dates[0].month + 1, 1);
+        newDates[0] = DateTime(dates[0].year, dates[0].month - 1, 1);
       } else if (page == 2) {
-        dates[0] = DateTime(dates[2].year, dates[2].month - 1, 1);
-        dates[1] = DateTime(dates[2].year, dates[2].month, 1);
-        dates[2] = DateTime(dates[2].year, dates[2].month + 1, 1);
-        page = page - 1;
+        newDates[0] = DateTime(dates[2].year, dates[2].month - 1, 1);
+        newDates[1] = DateTime(dates[2].year, dates[2].month - 1, 1);
+        newDates[2] = DateTime(dates[2].year, dates[2].month + 1, 1);
       }
 
       setState(() {
-        _isReloadSelectedDate = false;
-        _startWeekday = dates[page].weekday - firstDayOfWeek;
-        _endWeekday = dates[page + 1].weekday - firstDayOfWeek;
-        this._dates = dates;
+        this._dates = newDates;
       });
 
-      _controller.animateToPage(page,
-          duration: Duration(milliseconds: 1), curve: Threshold(0.0));
+      _controller.jumpToPage(1);
 
       //call callback
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _isReloadSelectedDate = false;
-        if (widget.onCalendarChanged != null) {
-          widget.onCalendarChanged(this._dates[1]);
-        }
+      if (widget.onCalendarChanged != null) {
+        widget.onCalendarChanged(this._dates[1]);
+      }
+
+      if (page == 0) {
+        newDates[2] = DateTime(dates[0].year, dates[0].month + 1, 1);
+        newDates[1] = DateTime(dates[0].year, dates[0].month, 1);
+        newDates[0] = DateTime(dates[0].year, dates[0].month - 1, 1);
+      } else if (page == 2) {
+        newDates[0] = DateTime(dates[2].year, dates[2].month - 1, 1);
+        newDates[1] = DateTime(dates[2].year, dates[2].month, 1);
+        newDates[2] = DateTime(dates[2].year, dates[2].month + 1, 1);
+      }
+
+      setState(() {
+        this._dates = newDates;
       });
     }
     return;
@@ -552,7 +573,6 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
   List<Widget> _renderWeekDays() {
     List<Widget> list = [];
 
-    /// because of number of days in a week is 7, so it would be easier to count it til 7.
     for (var i = firstDayOfWeek, count = 0;
         count < 7;
         i = (i + 1) % 7, count++) {
