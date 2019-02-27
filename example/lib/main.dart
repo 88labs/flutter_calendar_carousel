@@ -132,35 +132,13 @@ class _MyHomePageState extends State<MyHomePage> {
     /// Example Calendar Carousel without header and custom prev & next button
     _calendarCarouselNoHeader = CalendarCarousel<Event>(
       dateTileBuilder: (date, isThisMonthDay, isSelected) {
-        return Container(
-            child: Text(
+        return Text(
           '3件',
-          style: TextStyle(
-              fontSize: 12,
-              color: !isThisMonthDay ? Color(0xFFD8D8D8) : Color(0xFF888888)),
-        ));
+          style: TextStyle(fontSize: 10, color: Colors.black26),
+        );
       },
-      selectedBorderColor: Color(0xFFEF5E5E),
-      weekdayTextStyle: TextStyle(color: Color(0xFF888888)),
-      weekendTextStyle: TextStyle(color: Colors.redAccent),
-      daysTextStyle: TextStyle(color: Color(0xFF888888)),
-      selectedDayTextStyle: TextStyle(color: Color(0xFF888888)),
-      nextDaysTextStyle: TextStyle(color: Color(0xFFD8D8D8)),
-      prevDaysTextStyle: TextStyle(color: Color(0xFFD8D8D8)),
-      inactiveDaysTextStyle: TextStyle(color: Color(0xFFD8D8D8)),
-      inactiveWeekendTextStyle: TextStyle(color: Color(0xFFD8D8D8)),
-      headerMargin: EdgeInsets.all(5),
-      thisMonthDayBorderColor: Colors.grey,
-      height: 420.0,
-      selectedDateTime: _currentDate2,
-      todayTextStyle: TextStyle(
-        color: Colors.white,
-      ),
-      todayButtonColor: Colors.blue,
-      selectedDayBorderColor: Colors.white30,
-      childAspectRatio: 0.9,
-      dayPadding: 0,
-      selectedBgColor: Color(0xFFF7B5B5),
+      height: 450.0,
+      dayPadding: 0.5,
       locale: 'ja',
     );
 
