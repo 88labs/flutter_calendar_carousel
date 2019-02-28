@@ -559,7 +559,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
 
       //call callback
       if (widget.onCalendarChanged != null) {
-        widget.onCalendarChanged(this._dates[1]);
+        widget.onCalendarChanged(dates[page]);
       }
 
       if (page == 0) {
