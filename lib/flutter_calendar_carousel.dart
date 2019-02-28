@@ -455,25 +455,26 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                 maxLines: 1,
                               ),
                             ),
-                            widget.dateTileBuilder == null
-                                ? Container()
-                                : Expanded(
-                                    child: ListView(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.only(top: 4),
-                                          alignment: Alignment.center,
-                                          child: widget.dateTileBuilder(
-                                              now,
-                                              !isPrevMonthDay &&
-                                                  !isNextMonthDay,
-                                              isSelectedDay),
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: SingleChildScrollView(
+                                  child: widget.dateTileBuilder == null
+                                      ? Container()
+                                      : Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            widget.dateTileBuilder(
+                                                now,
+                                                !isPrevMonthDay &&
+                                                    !isNextMonthDay,
+                                                isSelectedDay),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  )
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ),
