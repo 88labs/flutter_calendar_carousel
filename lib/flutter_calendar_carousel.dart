@@ -8,7 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
 typedef DateTileBuilder = Widget Function(
-    DateTime date, bool isThisMonthDay, bool isSelected);
+    DateTime date, bool isThisMonthDay, bool isSelected, bool isMainPage);
 typedef MarkedDateIconBuilder<T> = Widget Function(T event);
 
 class CalendarCarousel<T> extends StatefulWidget {
@@ -469,7 +469,8 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                                 now,
                                                 !isPrevMonthDay &&
                                                     !isNextMonthDay,
-                                                isSelectedDay),
+                                                isSelectedDay,
+                                                slideIndex == 1),
                                           ],
                                         ),
                                 ),

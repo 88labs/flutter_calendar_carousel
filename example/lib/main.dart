@@ -131,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     /// Example Calendar Carousel without header and custom prev & next button
     _calendarCarouselNoHeader = CalendarCarousel<Event>(
-      dateTileBuilder: (date, isThisMonthDay, isSelected) {
+      dateTileBuilder: (date, isThisMonthDay, isSelected, isMainPage) {
         return Text(
           '3件',
           style: TextStyle(fontSize: 10, color: Colors.black26),
