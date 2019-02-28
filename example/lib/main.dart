@@ -140,6 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
       height: 450.0,
       dayPadding: 0.5,
       locale: 'ja',
+      dateCircularBorderColor: const Color(0xFFD8D8D8),
     );
 
     return new Scaffold(

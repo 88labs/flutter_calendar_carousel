@@ -67,6 +67,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final Color selectedDayBgColor;
   final Color headerArrowIconColor;
   final Color todayCircleColor;
+  final Color dateCircularBorderColor;
 
   // size
   final double dayPadding;
@@ -97,6 +98,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     TextStyle headerTextStyle,
     TextStyle weekendTextStyle,
     TextStyle weekDayTextStyle,
+    this.dateCircularBorderColor = Colors.transparent,
     this.todayCircleColor = Colors.blueAccent,
     this.selectedDayBgColor = const Color(0xFFF7B5B5),
     this.dayPadding = 2.0,
@@ -409,6 +411,10 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                     isSelectable = false;
                   }
 
+                  var header = now.day.toString().length == 1
+                      ? ' ${now.day} '
+                      : '${now.day}';
+
                   return GestureDetector(
                     onTap: () => isSelectable ? _onDayPressed(now) : {},
                     child: Container(
@@ -429,18 +435,22 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                     : Colors.transparent)),
                         padding: EdgeInsets.all(widget.dayPadding),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Container(
-                              padding: const EdgeInsets.all(5.0),
+                              padding: const EdgeInsets.all(4.0),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
+                                border: isSelectedDay
+                                    ? null
+                                    : Border.all(
+                                        width: 0.3,
+                                        color: widget.dateCircularBorderColor),
                                 color: isToday
                                     ? widget.todayCircleColor
                                     : Colors.transparent,
                               ),
                               child: Text(
-                                '${now.day}',
+                                header,
                                 style: textStyle,
                                 maxLines: 1,
                               ),
@@ -448,22 +458,20 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                             widget.dateTileBuilder == null
                                 ? Container()
                                 : Expanded(
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      margin: EdgeInsets.all(4),
-                                      child: ListView(
-                                        children: <Widget>[
-                                          Center(
-                                            child: widget.dateTileBuilder(
-                                                now,
-                                                !isPrevMonthDay &&
-                                                    !isNextMonthDay,
-                                                isSelectedDay),
-                                          ),
-                                        ],
-                                        physics: NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                      ),
+                                    child: ListView(
+                                      shrinkWrap: true,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      children: <Widget>[
+                                        Container(
+                                          margin: EdgeInsets.only(top: 4),
+                                          alignment: Alignment.center,
+                                          child: widget.dateTileBuilder(
+                                              now,
+                                              !isPrevMonthDay &&
+                                                  !isNextMonthDay,
+                                              isSelectedDay),
+                                        ),
+                                      ],
                                     ),
                                   )
                           ],
