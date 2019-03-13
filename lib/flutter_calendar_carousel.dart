@@ -3,6 +3,7 @@ library flutter_calendar_dooboo;
 import 'dart:async';
 
 import 'package:date_util/date_util.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart' show DateFormat;
@@ -13,7 +14,7 @@ typedef MarkedDateIconBuilder<T> = Widget Function(T event);
 
 class CalendarCarousel<T> extends StatefulWidget {
   static final TextStyle defaultHeaderTextStyle = TextStyle(
-    fontSize: 14.0,
+    fontSize: 16.0,
     color: Colors.black,
   );
   static final TextStyle defaultOutedDaysTextStyle = TextStyle(
@@ -106,7 +107,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.width = double.infinity,
     this.selectedDayBorderColor = const Color(0xFFEF5E5E),
     this.onDayPressed,
-    this.headerMargin = const EdgeInsets.symmetric(vertical: 16.0),
+    this.headerMargin = const EdgeInsets.symmetric(vertical: 0.0),
     this.childAspectRatio = 1.0,
     this.weekDayMargin = const EdgeInsets.only(bottom: 4.0),
     this.showWeekDays = true,
@@ -123,7 +124,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.staticSixWeekFormat = false,
     this.dateTileBuilder,
     multiSelectedDate,
-    this.headerArrowIconColor = Colors.blueAccent,
+    this.headerArrowIconColor = Colors.black45,
   })  : this.multiSelectedDate = multiSelectedDate ?? [],
         this.daysTextStyle = daysTextStyle ?? defaultDaysTextStyle,
         this.todayTextStyle = todayTextStyle ?? defaultTodayTextStyle,
@@ -201,13 +202,12 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
 
   @override
   Widget build(BuildContext context) {
-    Widget headerText = DefaultTextStyle(
-        style: TextStyle(fontSize: 16.0, color: Colors.black),
-        child: Text(
-          '${_localeDate.format(_dates[1])}',
-          style: widget.headerTextStyle,
-        ));
+    Widget headerText = Text(
+      '${_localeDate.format(_dates[1])}',
+      style: widget.headerTextStyle,
+    );
     return Container(
+      color: Colors.white,
       width: widget.width,
       height: widget.height,
       child: Column(
@@ -215,41 +215,57 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
           widget.showHeader
               ? Container(
                   decoration: BoxDecoration(
-                      border:
-                          Border(bottom: BorderSide(color: Color(0xFFEEEEEE)))),
+                      border: Border(
+                          bottom: BorderSide(color: Color(0xFFEEEEEE)),
+                          top: BorderSide(color: Color(0xFFEEEEEE)))),
                   margin: EdgeInsets.only(
                     top: widget.headerMargin.top,
                     bottom: widget.headerMargin.bottom,
                   ),
-                  child: DefaultTextStyle(
-                      style: widget.headerTextStyle,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            widget.showHeaderButton
-                                ? IconButton(
-                                    onPressed: () => _setPage(0, null),
-                                    icon: Icon(Icons.chevron_left,
-                                        color: widget.headerArrowIconColor),
-                                  )
-                                : Container(),
-                            widget.headerTitleTouchable
-                                ? FlatButton(
-                                    onPressed:
-                                        widget.onHeaderTitlePressed != null
-                                            ? widget.onHeaderTitlePressed
-                                            : () => _selectDateFromPicker(),
-                                    child: headerText,
-                                  )
-                                : headerText,
-                            widget.showHeaderButton
-                                ? IconButton(
-                                    onPressed: () => _setPage(2, null),
-                                    icon: Icon(Icons.chevron_right,
-                                        color: widget.headerArrowIconColor),
-                                  )
-                                : Container(),
-                          ])),
+                  child: Container(
+                    margin: EdgeInsets.all(7),
+                    child: DefaultTextStyle(
+                        style: widget.headerTextStyle,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Container(
+                                child: GestureDetector(
+                                  onTap: () => _setPage(0, null),
+                                  child: widget.showHeaderButton
+                                      ? Icon(
+                                          CupertinoIcons.left_chevron,
+                                          color: widget.headerArrowIconColor,
+                                          size: 20,
+                                        )
+                                      : Container(),
+                                ),
+                                margin: EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              widget.headerTitleTouchable
+                                  ? FlatButton(
+                                      onPressed:
+                                          widget.onHeaderTitlePressed != null
+                                              ? widget.onHeaderTitlePressed
+                                              : () => _selectDateFromPicker(),
+                                      child: headerText,
+                                    )
+                                  : headerText,
+                              Container(
+                                child: GestureDetector(
+                                  onTap: () => _setPage(2, null),
+                                  child: widget.showHeaderButton
+                                      ? Icon(
+                                          CupertinoIcons.right_chevron,
+                                          color: widget.headerArrowIconColor,
+                                          size: 20,
+                                        )
+                                      : Container(),
+                                ),
+                                margin: EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                            ])),
+                  ),
                 )
               : Container(),
           Container(
