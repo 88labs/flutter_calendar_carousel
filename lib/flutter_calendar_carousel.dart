@@ -109,7 +109,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.onDayPressed,
     this.headerMargin = const EdgeInsets.symmetric(vertical: 0.0),
     this.childAspectRatio = 1.0,
-    this.weekDayMargin = const EdgeInsets.only(bottom: 4.0),
+    this.weekDayMargin = const EdgeInsets.symmetric(vertical: 4.0),
     this.showWeekDays = true,
     this.showHeader = true,
     this.showHeaderButton = true,
