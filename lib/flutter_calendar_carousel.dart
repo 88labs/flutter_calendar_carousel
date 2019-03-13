@@ -194,7 +194,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
   }
 
   @override
-  didUpdateWidget(Widget oldWidget) async {
+  didUpdateWidget(Widget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.multiSelectedDate != null) {
       setState(() {
