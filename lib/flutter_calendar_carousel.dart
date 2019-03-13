@@ -187,8 +187,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     _localeDate = DateFormat.yMMM(widget.locale);
     firstDayOfWeek = (_localeDate.dateSymbols.FIRSTDAYOFWEEK + 1) % 7;
 
-    if (widget.multiSelectedDate != null &&
-        widget.multiSelectedDate.isNotEmpty) {
+    if (widget.multiSelectedDate != null) {
       _multiSelectedDate = widget.multiSelectedDate;
     }
     _setPage(-1, DateTime.now());
@@ -357,8 +356,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                           DateTime.now().month == month &&
                           DateTime.now().year == year;
                   bool isSelectedDay = false;
-                  if (_multiSelectedDate != null &&
-                      _multiSelectedDate.isNotEmpty) {
+                  if (_multiSelectedDate != null) {
                     final days = _multiSelectedDate;
                     final day = index + 1 - _startWeekday;
                     final dayNum = DateUtil().daysInMonth(month, year);
