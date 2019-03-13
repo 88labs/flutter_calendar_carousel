@@ -194,6 +194,16 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
   }
 
   @override
+  didUpdateWidget(Widget oldWidget) async {
+    super.didUpdateWidget(oldWidget);
+    if (widget.multiSelectedDate != null) {
+      setState(() {
+        _multiSelectedDate = widget.multiSelectedDate;
+      });
+    }
+  }
+
+  @override
   dispose() {
     _controller.dispose();
     super.dispose();
