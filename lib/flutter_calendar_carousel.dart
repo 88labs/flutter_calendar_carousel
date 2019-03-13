@@ -79,7 +79,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final EdgeInsets weekDayMargin;
 
   // callback
-  final Function(DateTime, List<DateTime>) onDayPressed;
+  final bool Function(DateTime, List<DateTime>) onDayPressed;
   final Function(DateTime) onCalendarChanged;
   final Function onHeaderTitlePressed;
 
@@ -508,17 +508,21 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
 
   void _onDayPressed(DateTime picked) {
     final dates = _multiSelectedDate;
+    var canSelect = true;
 
-    setState(() {
-      if (dates.indexOf(picked) > -1) {
-        dates.remove(picked);
-      } else {
-        dates.add(picked);
-      }
-      _multiSelectedDate = dates;
-    });
     if (widget.onDayPressed != null) {
-      widget.onDayPressed(picked, dates);
+      canSelect = widget.onDayPressed(picked, dates);
+    }
+
+    if (canSelect) {
+      setState(() {
+        if (dates.indexOf(picked) > -1) {
+          dates.remove(picked);
+        } else {
+          dates.add(picked);
+        }
+        _multiSelectedDate = dates;
+      });
     }
   }
 
