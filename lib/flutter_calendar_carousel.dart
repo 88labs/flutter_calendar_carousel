@@ -1,7 +1,5 @@
 library flutter_calendar_dooboo;
 
-import 'dart:async';
-
 import 'package:date_util/date_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -194,7 +192,11 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     if (widget.multiSelectedDate != null) {
       _multiSelectedDate = widget.multiSelectedDate;
     }
-    _setPage(-1, DateTime.now());
+    _setPage(
+        -1,
+        _multiSelectedDate != null && _multiSelectedDate.isNotEmpty
+            ? _multiSelectedDate.first
+            : DateTime.now());
   }
 
   @override
@@ -258,15 +260,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                   padding: EdgeInsets.symmetric(horizontal: 30),
                                 ),
                               ),
-                              widget.headerTitleTouchable
-                                  ? FlatButton(
-                                      onPressed:
-                                          widget.onHeaderTitlePressed != null
-                                              ? widget.onHeaderTitlePressed
-                                              : () => _selectDateFromPicker(),
-                                      child: headerText,
-                                    )
-                                  : headerText,
+                              headerText,
                               FlatButton(
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,
@@ -529,24 +523,6 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
         }
         _multiSelectedDate = dates;
       });
-    }
-  }
-
-  Future<Null> _selectDateFromPicker() async {
-    DateTime selected = await showDatePicker(
-      context: context,
-      initialDate: new DateTime.now(),
-      firstDate: widget.minSelectedDate != null
-          ? widget.minSelectedDate
-          : DateTime(1960),
-      lastDate: widget.maxSelectedDate != null
-          ? widget.maxSelectedDate
-          : DateTime(2050),
-    );
-
-    if (selected != null) {
-      // updating selected date range based on selected week
-      _setPage(-1, selected);
     }
   }
 
