@@ -63,6 +63,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final bool headerTitleTouchable;
   final ScrollPhysics customGridViewPhysics;
   final bool scrollable;
+  final bool canSelectOutOfMonthDay;
 
   // color
   final Color selectedDayBorderColor;
@@ -124,7 +125,8 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.weekDayFormat = WeekdayFormat.short,
     this.staticSixWeekFormat = false,
     this.dateTileBuilder,
-    this.scrollable = false,
+    this.scrollable = true,
+    this.canSelectOutOfMonthDay = true,
     multiSelectedDate,
     this.headerArrowIconColor = Colors.black45,
   })  : this.multiSelectedDate = multiSelectedDate ?? [],
@@ -426,6 +428,9 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                 } else if (widget.maxSelectedDate != null &&
                     now.millisecondsSinceEpoch >
                         widget.maxSelectedDate.millisecondsSinceEpoch) {
+                  isSelectable = false;
+                } else if (!widget.canSelectOutOfMonthDay &&
+                    (isPrevMonthDay || isNextMonthDay)) {
                   isSelectable = false;
                 }
 
