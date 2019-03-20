@@ -232,15 +232,14 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                     bottom: widget.headerMargin.bottom,
                   ),
                   child: Container(
-                    margin: EdgeInsets.all(7),
                     child: DefaultTextStyle(
                         style: widget.headerTextStyle,
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Container(
-                                child: GestureDetector(
-                                  onTap: () => _setPage(0, null),
+                              FlatButton(
+                                onPressed: () => _setPage(0, null),
+                                child: Container(
                                   child: widget.showHeaderButton
                                       ? Icon(
                                           CupertinoIcons.left_chevron,
@@ -248,8 +247,8 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                           size: 20,
                                         )
                                       : Container(),
+                                  padding: EdgeInsets.symmetric(horizontal: 30),
                                 ),
-                                margin: EdgeInsets.symmetric(horizontal: 16),
                               ),
                               widget.headerTitleTouchable
                                   ? FlatButton(
@@ -260,9 +259,9 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                       child: headerText,
                                     )
                                   : headerText,
-                              Container(
-                                child: GestureDetector(
-                                  onTap: () => _setPage(2, null),
+                              FlatButton(
+                                onPressed: () => _setPage(2, null),
+                                child: Container(
                                   child: widget.showHeaderButton
                                       ? Icon(
                                           CupertinoIcons.right_chevron,
@@ -270,8 +269,8 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                                           size: 20,
                                         )
                                       : Container(),
+                                  padding: EdgeInsets.symmetric(horizontal: 30),
                                 ),
-                                margin: EdgeInsets.symmetric(horizontal: 16),
                               ),
                             ])),
                   ),
@@ -300,7 +299,6 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
             itemBuilder: (context, index) {
               return builder(index);
             },
-//            pageSnapping: true,
           )),
         ],
       ),
