@@ -305,7 +305,7 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     );
   }
 
-  AnimatedBuilder builder(int slideIndex) {
+  Widget builder(int slideIndex) {
     final date = _dates[slideIndex];
 
     final dates = List<DateTime>(3);
@@ -330,185 +330,167 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
     int year = _dates[slideIndex].year;
     int month = _dates[slideIndex].month;
 
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        double value = 1.0;
-        if (_controller.position.haveDimensions) {
-          value = _controller.page - slideIndex;
-          value = (1 - (value.abs() * .5)).clamp(0.0, 1.0);
-        }
-
-        return Center(
-          child: SizedBox(
-            height: Curves.easeOut.transform(value) * widget.height,
-            width: Curves.easeOut.transform(value) * screenWidth,
-            child: child,
-          ),
-        );
-      },
-      child: Stack(
-        children: <Widget>[
-          Positioned(
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              child: GridView.count(
-                physics: widget.customGridViewPhysics,
-                crossAxisCount: 7,
-                childAspectRatio: widget.childAspectRatio,
-                padding: EdgeInsets.all(2),
-                children: List.generate(totalItemCount, (index) {
-                  bool isToday =
-                      DateTime.now().day == index + 1 - _startWeekday &&
-                          DateTime.now().month == month &&
-                          DateTime.now().year == year;
-                  bool isSelectedDay = false;
-                  if (_multiSelectedDate != null) {
-                    final days = _multiSelectedDate;
-                    final day = index + 1 - _startWeekday;
-                    final dayNum = DateUtil().daysInMonth(month, year);
-                    if (day <= 0) {
-                      final prevMonthDay = DateTime(year, month, 1)
-                          .subtract(Duration(days: -1 * (day - 1)));
-                      isSelectedDay = days
-                          .where((_day) =>
-                              _day.year == prevMonthDay.year &&
-                              _day.month == prevMonthDay.month &&
-                              _day.day == prevMonthDay.day)
-                          .isNotEmpty;
-                    } else if (day > dayNum) {
-                      final prevMonthDay = DateTime(year, month, dayNum)
-                          .subtract(Duration(days: -(day - dayNum)));
-                      isSelectedDay = days
-                          .where((_day) =>
-                              _day.year == prevMonthDay.year &&
-                              _day.month == prevMonthDay.month &&
-                              _day.day == prevMonthDay.day)
-                          .isNotEmpty;
-                    } else {
-                      isSelectedDay = days
-                          .where((_day) =>
-                              _day.year == year &&
-                              _day.month == month &&
-                              _day.day == day)
-                          .isNotEmpty;
-                    }
-                  }
-                  bool isPrevMonthDay = index < _startWeekday;
-                  bool isNextMonthDay = index >=
-                      (DateTime(year, month + 1, 0).day) + _startWeekday;
-                  bool isWeekend = index % 7 == 0 || index % 7 == 6;
-
-                  DateTime now = DateTime(year, month, 1);
-
-                  var textStyle = widget.daysTextStyle;
-
-                  if (isToday) {
-                    textStyle = widget.todayTextStyle;
-                  } else if (isSelectedDay) {
-                    textStyle = widget.selectedDayTextStyle;
-                  } else if (isPrevMonthDay || isNextMonthDay) {
-                    textStyle = widget.outedDaysTextStyle;
-                  } else if (isWeekend) {
-                    textStyle = widget.weekendTextStyle;
-                  }
-
-                  if (isPrevMonthDay) {
-                    now = now.subtract(Duration(days: _startWeekday - index));
-                  } else if (isNextMonthDay) {
-                    now = DateTime(year, month, index + 1 - _startWeekday);
+    return Stack(
+      children: <Widget>[
+        Positioned(
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            child: GridView.count(
+              physics: widget.customGridViewPhysics,
+              crossAxisCount: 7,
+              childAspectRatio: widget.childAspectRatio,
+              padding: EdgeInsets.all(2),
+              children: List.generate(totalItemCount, (index) {
+                bool isToday =
+                    DateTime.now().day == index + 1 - _startWeekday &&
+                        DateTime.now().month == month &&
+                        DateTime.now().year == year;
+                bool isSelectedDay = false;
+                if (_multiSelectedDate != null) {
+                  final days = _multiSelectedDate;
+                  final day = index + 1 - _startWeekday;
+                  final dayNum = DateUtil().daysInMonth(month, year);
+                  if (day <= 0) {
+                    final prevMonthDay = DateTime(year, month, 1)
+                        .subtract(Duration(days: -1 * (day - 1)));
+                    isSelectedDay = days
+                        .where((_day) =>
+                            _day.year == prevMonthDay.year &&
+                            _day.month == prevMonthDay.month &&
+                            _day.day == prevMonthDay.day)
+                        .isNotEmpty;
+                  } else if (day > dayNum) {
+                    final prevMonthDay = DateTime(year, month, dayNum)
+                        .subtract(Duration(days: -(day - dayNum)));
+                    isSelectedDay = days
+                        .where((_day) =>
+                            _day.year == prevMonthDay.year &&
+                            _day.month == prevMonthDay.month &&
+                            _day.day == prevMonthDay.day)
+                        .isNotEmpty;
                   } else {
-                    now = DateTime(year, month, index + 1 - _startWeekday);
+                    isSelectedDay = days
+                        .where((_day) =>
+                            _day.year == year &&
+                            _day.month == month &&
+                            _day.day == day)
+                        .isNotEmpty;
                   }
+                }
+                bool isPrevMonthDay = index < _startWeekday;
+                bool isNextMonthDay =
+                    index >= (DateTime(year, month + 1, 0).day) + _startWeekday;
+                bool isWeekend = index % 7 == 0 || index % 7 == 6;
 
-                  bool isSelectable = true;
-                  if (widget.minSelectedDate != null &&
-                      now.millisecondsSinceEpoch <
-                          widget.minSelectedDate.millisecondsSinceEpoch) {
-                    isSelectable = false;
-                  } else if (widget.maxSelectedDate != null &&
-                      now.millisecondsSinceEpoch >
-                          widget.maxSelectedDate.millisecondsSinceEpoch) {
-                    isSelectable = false;
-                  }
+                DateTime now = DateTime(year, month, 1);
 
-                  var header = now.day.toString().length == 1
-                      ? ' ${now.day} '
-                      : '${now.day}';
+                var textStyle = widget.daysTextStyle;
 
-                  return GestureDetector(
-                    onTap: () => isSelectable ? _onDayPressed(now) : {},
+                if (isToday) {
+                  textStyle = widget.todayTextStyle;
+                } else if (isSelectedDay) {
+                  textStyle = widget.selectedDayTextStyle;
+                } else if (isPrevMonthDay || isNextMonthDay) {
+                  textStyle = widget.outedDaysTextStyle;
+                } else if (isWeekend) {
+                  textStyle = widget.weekendTextStyle;
+                }
+
+                if (isPrevMonthDay) {
+                  now = now.subtract(Duration(days: _startWeekday - index));
+                } else if (isNextMonthDay) {
+                  now = DateTime(year, month, index + 1 - _startWeekday);
+                } else {
+                  now = DateTime(year, month, index + 1 - _startWeekday);
+                }
+
+                bool isSelectable = true;
+                if (widget.minSelectedDate != null &&
+                    now.millisecondsSinceEpoch <
+                        widget.minSelectedDate.millisecondsSinceEpoch) {
+                  isSelectable = false;
+                } else if (widget.maxSelectedDate != null &&
+                    now.millisecondsSinceEpoch >
+                        widget.maxSelectedDate.millisecondsSinceEpoch) {
+                  isSelectable = false;
+                }
+
+                var header = now.day.toString().length == 1
+                    ? ' ${now.day} '
+                    : '${now.day}';
+
+                return GestureDetector(
+                  onTap: () => isSelectable ? _onDayPressed(now) : {},
+                  child: Container(
+                    padding: EdgeInsets.all(widget.dayPadding),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                            bottom: BorderSide(color: Color(0xFFEEEEEE)))),
                     child: Container(
-                      padding: EdgeInsets.all(widget.dayPadding),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border(
-                              bottom: BorderSide(color: Color(0xFFEEEEEE)))),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: isSelectedDay
-                                ? widget.selectedDayBgColor
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                                color: isSelectedDay
-                                    ? widget.selectedDayBorderColor
-                                    : Colors.transparent)),
-                        padding: EdgeInsets.all(widget.dayPadding),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              padding: const EdgeInsets.all(4.0),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: isSelectedDay
-                                    ? null
-                                    : Border.all(
-                                        width: 0.3,
-                                        color: widget.dateCircularBorderColor),
-                                color: isToday
-                                    ? widget.todayCircleColor
-                                    : Colors.transparent,
-                              ),
-                              child: Text(
-                                header,
-                                style: textStyle,
-                                maxLines: 1,
+                          color: isSelectedDay
+                              ? widget.selectedDayBgColor
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                              color: isSelectedDay
+                                  ? widget.selectedDayBorderColor
+                                  : Colors.transparent)),
+                      padding: EdgeInsets.all(widget.dayPadding),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.all(4.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: isSelectedDay
+                                  ? null
+                                  : Border.all(
+                                      width: 0.3,
+                                      color: widget.dateCircularBorderColor),
+                              color: isToday
+                                  ? widget.todayCircleColor
+                                  : Colors.transparent,
+                            ),
+                            child: Text(
+                              header,
+                              style: textStyle,
+                              maxLines: 1,
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: SingleChildScrollView(
+                                child: widget.dateTileBuilder == null
+                                    ? Container()
+                                    : Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          widget.dateTileBuilder(
+                                              now,
+                                              !isPrevMonthDay &&
+                                                  !isNextMonthDay,
+                                              isSelectedDay,
+                                              slideIndex == 1),
+                                        ],
+                                      ),
                               ),
                             ),
-                            Expanded(
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: SingleChildScrollView(
-                                  child: widget.dateTileBuilder == null
-                                      ? Container()
-                                      : Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            widget.dateTileBuilder(
-                                                now,
-                                                !isPrevMonthDay &&
-                                                    !isNextMonthDay,
-                                                isSelectedDay,
-                                                slideIndex == 1),
-                                          ],
-                                        ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                          )
+                        ],
                       ),
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              }),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
