@@ -62,6 +62,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final bool showHeaderButton;
   final bool headerTitleTouchable;
   final ScrollPhysics customGridViewPhysics;
+  final bool scrollable;
 
   // color
   final Color selectedDayBorderColor;
@@ -123,6 +124,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.weekDayFormat = WeekdayFormat.short,
     this.staticSixWeekFormat = false,
     this.dateTileBuilder,
+    this.scrollable = false,
     multiSelectedDate,
     this.headerArrowIconColor = Colors.black45,
   })  : this.multiSelectedDate = multiSelectedDate ?? [],
@@ -215,93 +217,91 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
       '${_localeDate.format(_dates[1])}',
       style: widget.headerTextStyle,
     );
-    return Container(
-      color: Colors.white,
-      width: widget.width,
-      height: widget.height,
-      child: Column(
-        children: <Widget>[
-          widget.showHeader
-              ? Container(
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(color: Color(0xFFEEEEEE)),
-                          top: BorderSide(color: Color(0xFFEEEEEE)))),
-                  margin: EdgeInsets.only(
-                    top: widget.headerMargin.top,
-                    bottom: widget.headerMargin.bottom,
-                  ),
-                  child: Container(
-                    child: DefaultTextStyle(
-                        style: widget.headerTextStyle,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              FlatButton(
-                                onPressed: () => _setPage(0, null),
-                                child: Container(
-                                  child: widget.showHeaderButton
-                                      ? Icon(
-                                          CupertinoIcons.left_chevron,
-                                          color: widget.headerArrowIconColor,
-                                          size: 20,
-                                        )
-                                      : Container(),
-                                  padding: EdgeInsets.symmetric(horizontal: 30),
-                                ),
+    return Column(
+      children: <Widget>[
+        widget.showHeader
+            ? Container(
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(color: Color(0xFFEEEEEE)),
+                        top: BorderSide(color: Color(0xFFEEEEEE)))),
+                margin: EdgeInsets.only(
+                  top: widget.headerMargin.top,
+                  bottom: widget.headerMargin.bottom,
+                ),
+                child: Container(
+                  child: DefaultTextStyle(
+                      style: widget.headerTextStyle,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            FlatButton(
+                              onPressed: () => _setPage(0, null),
+                              child: Container(
+                                child: widget.showHeaderButton
+                                    ? Icon(
+                                        CupertinoIcons.left_chevron,
+                                        color: widget.headerArrowIconColor,
+                                        size: 20,
+                                      )
+                                    : Container(),
+                                padding: EdgeInsets.symmetric(horizontal: 30),
                               ),
-                              widget.headerTitleTouchable
-                                  ? FlatButton(
-                                      onPressed:
-                                          widget.onHeaderTitlePressed != null
-                                              ? widget.onHeaderTitlePressed
-                                              : () => _selectDateFromPicker(),
-                                      child: headerText,
-                                    )
-                                  : headerText,
-                              FlatButton(
-                                onPressed: () => _setPage(2, null),
-                                child: Container(
-                                  child: widget.showHeaderButton
-                                      ? Icon(
-                                          CupertinoIcons.right_chevron,
-                                          color: widget.headerArrowIconColor,
-                                          size: 20,
-                                        )
-                                      : Container(),
-                                  padding: EdgeInsets.symmetric(horizontal: 30),
-                                ),
+                            ),
+                            widget.headerTitleTouchable
+                                ? FlatButton(
+                                    onPressed:
+                                        widget.onHeaderTitlePressed != null
+                                            ? widget.onHeaderTitlePressed
+                                            : () => _selectDateFromPicker(),
+                                    child: headerText,
+                                  )
+                                : headerText,
+                            FlatButton(
+                              onPressed: () => _setPage(2, null),
+                              child: Container(
+                                child: widget.showHeaderButton
+                                    ? Icon(
+                                        CupertinoIcons.right_chevron,
+                                        color: widget.headerArrowIconColor,
+                                        size: 20,
+                                      )
+                                    : Container(),
+                                padding: EdgeInsets.symmetric(horizontal: 30),
                               ),
-                            ])),
-                  ),
-                )
-              : Container(),
-          Container(
-            decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Color(0xFFEEEEEE)))),
-            child: !widget.showWeekDays
-                ? Container()
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: _renderWeekDays(),
-                  ),
-          ),
-          Expanded(
-              child: PageView.builder(
-            itemCount: 3,
-            onPageChanged: (index) {
-              if (_currentPage != index) {
-                _shouldChange = true;
-              }
-            },
-            controller: _controller,
-            itemBuilder: (context, index) {
-              return builder(index);
-            },
-          )),
-        ],
-      ),
+                            ),
+                          ])),
+                ),
+              )
+            : Container(),
+        Container(
+          decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Color(0xFFEEEEEE)))),
+          child: !widget.showWeekDays
+              ? Container()
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: _renderWeekDays(),
+                ),
+        ),
+        Expanded(
+            child: PageView.builder(
+          itemCount: 3,
+          physics: widget.scrollable
+              ? ScrollPhysics()
+              : NeverScrollableScrollPhysics(),
+          onPageChanged: (index) {
+            if (_currentPage != index) {
+              _shouldChange = true;
+            }
+          },
+          controller: _controller,
+          itemBuilder: (context, index) {
+            return builder(index);
+          },
+        )),
+      ],
     );
   }
 
