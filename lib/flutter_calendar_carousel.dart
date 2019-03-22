@@ -69,6 +69,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final Color headerArrowIconColor;
   final Color todayCircleColor;
   final Color dateCircularBorderColor;
+  final Color selectedDayWholeBgColor;
 
   // size
   final double dayPadding;
@@ -101,6 +102,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     TextStyle weekDayTextStyle,
     this.dateCircularBorderColor = Colors.transparent,
     this.todayCircleColor = Colors.blueAccent,
+    this.selectedDayWholeBgColor,
     this.selectedDayBgColor = const Color(0xFFF7B5B5),
     this.dayPadding = 2.0,
     this.height = double.infinity,
@@ -437,17 +439,22 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
                   child: Container(
                     padding: EdgeInsets.all(widget.dayPadding),
                     decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isSelectedDay &&
+                                widget.selectedDayWholeBgColor != null
+                            ? widget.selectedDayWholeBgColor
+                            : Colors.white,
                         border: Border(
                             bottom: BorderSide(color: Color(0xFFEEEEEE)))),
                     child: Container(
                       decoration: BoxDecoration(
-                          color: isSelectedDay
+                          color: isSelectedDay &&
+                                  widget.selectedDayWholeBgColor == null
                               ? widget.selectedDayBgColor
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(5),
                           border: Border.all(
-                              color: isSelectedDay
+                              color: isSelectedDay &&
+                                      widget.selectedDayWholeBgColor == null
                                   ? widget.selectedDayBorderColor
                                   : Colors.transparent)),
                       padding: EdgeInsets.all(widget.dayPadding),
