@@ -129,7 +129,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    /// Example Calendar Carousel without header and custom prev & next button
     _calendarCarouselNoHeader = CalendarCarousel<Event>(
       dateTileBuilder: (date, isThisMonthDay, isSelected, isMainPage) {
         return Text(
@@ -137,10 +136,13 @@ class _MyHomePageState extends State<MyHomePage> {
           style: TextStyle(fontSize: 10, color: Colors.black26),
         );
       },
+      multiSelectedDate: <DateTime>[],
+      selectedDayWholeBgColor: Colors.black12,
       height: 450.0,
       dayPadding: 0.5,
       locale: 'ja',
       dateCircularBorderColor: const Color(0xFFD8D8D8),
+      canSelectMultiple: false,
     );
 
     return new Scaffold(
@@ -203,6 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 16.0),
+                height: 300,
                 child: _calendarCarouselNoHeader,
               ), //
             ],

@@ -62,6 +62,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final ScrollPhysics customGridViewPhysics;
   final bool scrollable;
   final bool canSelectOutOfMonthDay;
+  final bool canSelectMultiple;
 
   // color
   final Color selectedDayBorderColor;
@@ -80,7 +81,7 @@ class CalendarCarousel<T> extends StatefulWidget {
   final EdgeInsets weekDayMargin;
 
   // callback
-  final bool Function(DateTime, List<DateTime>) onDayPressed;
+  final void Function(DateTime, List<DateTime>) onDayPressed;
   final Function(DateTime) onCalendarChanged;
   final Function onHeaderTitlePressed;
 
@@ -128,6 +129,7 @@ class CalendarCarousel<T> extends StatefulWidget {
     this.scrollable = true,
     this.canSelectOutOfMonthDay = true,
     multiSelectedDate,
+    this.canSelectMultiple = true,
     this.headerArrowIconColor = Colors.black45,
   })  : this.multiSelectedDate = multiSelectedDate ?? [],
         this.daysTextStyle = daysTextStyle ?? defaultDaysTextStyle,
@@ -515,19 +517,26 @@ class _CalendarState<T> extends State<CalendarCarousel<T>> {
 
   void _onDayPressed(DateTime picked) {
     final dates = _multiSelectedDate;
-    var canSelect = true;
+    final canSelectMultiple = widget.canSelectMultiple;
 
     if (widget.onDayPressed != null) {
-      canSelect = widget.onDayPressed(picked, dates);
+      widget.onDayPressed(picked, dates);
     }
 
-    if (canSelect) {
+    if (canSelectMultiple) {
       setState(() {
         if (dates.indexOf(picked) > -1) {
           dates.remove(picked);
         } else {
           dates.add(picked);
         }
+        _multiSelectedDate = dates;
+      });
+    } else {
+      setState(() {
+        dates
+          ..clear()
+          ..add(picked);
         _multiSelectedDate = dates;
       });
     }
